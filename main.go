@@ -22,9 +22,11 @@ func main() {
 		configFile = "rules.hcl"
 	}
 
-	LoadConfigFromFile(configFile)
-
 	logged := handlers.CombinedLoggingHandler(os.Stderr, Handlers())
+
+	if err := LoadConfigFromFile(configFile); err != nil {
+		log.Fatalf("Failed to read config file '%s': %s", configFile, err)
+	}
 
 	if err := http.ListenAndServe(listenAddress, logged); err != nil {
 		log.Fatal(err)
