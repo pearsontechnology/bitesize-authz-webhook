@@ -3,7 +3,8 @@
 set -e
 
 VERSION=${1:-0.0.1}
-DOCKER_IMAGE=geribatai/bitesize-authz-webhook:${VERSION}
+DOCKER_REPO="geribatai/bitesize-authz-webhook"
+DOCKER_IMAGE=${DOCKER_REPO}:${VERSION}
 
 # run tests before build
 echo "Running go test..."
