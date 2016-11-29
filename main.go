@@ -1,47 +1,39 @@
 package main
 
-// import "log"
 import (
+	"github.com/caarlos0/env"
+	"github.com/gorilla/handlers"
 	"log"
 	"net/http"
 	"os"
-	"strconv"
-
-	"github.com/gorilla/handlers"
 )
 
+type envConfig struct {
+	ListenAddress string `env:"LISTEN_PORT" envDefault:"8080"`
+	RulesFile     string `env:"RULES_CONFIG" envDefault:"rules.hcl"`
+	CertKey       string `env:"SSL_CERT" envDefault:"cert.pem"`
+	PrivateKey    string `env:"SSL_KEY" envDefault:"key.pem"`
+	HttpsEnabled  bool   `env:"HTTPS_ENABLED"`
+}
+
 func main() {
-	listenAddress := ":8080"
-	optPort := os.Getenv("LISTEN_PORT")
-	if optPort != "" {
-		listenAddress = ":" + os.Getenv("LISTEN_PORT")
-	}
+	cfg := envConfig{}
+	env.Parse(&cfg)
 
-	HTTPS_ENABLED := false
-	optHttpsEnabled := os.Getenv("HTTPS_ENABLED")
-	parsedOutput, _ := strconv.ParseBool(optHttpsEnabled)
-	if parsedOutput == true {
-		HTTPS_ENABLED = true
-	}
-
-	configFile := os.Getenv("RULES_CONFIG")
-
-	if configFile == "" {
-		configFile = "rules.hcl"
-	}
+	Address := ":" + cfg.ListenAddress
 
 	logged := handlers.CombinedLoggingHandler(os.Stderr, Handlers())
 
-	if err := LoadConfigFromFile(configFile); err != nil {
-		log.Fatalf("Failed to read config file '%s': %s", configFile, err)
+	if err := LoadConfigFromFile(cfg.RulesFile); err != nil {
+		log.Fatalf("Failed to read config file '%s': %s", cfg.RulesFile, err)
 	}
 
-	if HTTPS_ENABLED == true {
-		if err := http.ListenAndServeTLS(listenAddress, "cert.pem", "key.pem", logged); err != nil {
+	if cfg.HttpsEnabled {
+		if err := http.ListenAndServeTLS(Address, cfg.CertKey, cfg.PrivateKey, logged); err != nil {
 			log.Fatal(err)
 		}
 	} else {
-		if err := http.ListenAndServe(listenAddress, logged); err != nil {
+		if err := http.ListenAndServe(Address, logged); err != nil {
 			log.Fatal(err)
 		}
 	}
