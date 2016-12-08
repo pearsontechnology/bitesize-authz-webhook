@@ -8,6 +8,19 @@ access "deny" {
     username = "badguy"
 }
 
+# manage access for users in a single or multiple groups
+access "allow" {
+   group = "(operations|engineering)"
+}
+
+access "deny" {
+   group = "(badgang|badgroup)"
+}
+
+access "deny" {
+   group = "banned"
+}
+
 # God mode for regular non-serviceaccount users 
 access "allow" {
     username = "[a-z]+"
