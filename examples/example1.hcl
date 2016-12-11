@@ -30,7 +30,6 @@ access "allow" {
 access "allow" {
     username = "system:serviceaccount:.*:default"
     verb = "create"
-    group = "extensions"
     resource = "thirdpartyresources"
 }
 

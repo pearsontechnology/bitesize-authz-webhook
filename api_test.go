@@ -190,7 +190,6 @@ func TestCustomVerb(t *testing.T) {
 		username string
 		status   int
 	}{
-		{"create", "banned", "thirdpartyresources", "system:serviceaccount:random:default", 403},
 		{"create", "extensions", "thirdpartyresources", "system:serviceaccount:random:default", 200},
 	}
 
