@@ -74,24 +74,33 @@ func LoadConfigFromByteArray(hclText []byte) error {
 // GetAccessMode returns allow/deny if request is described in the rule
 func (s *ConfigRule) GetAccessMode(context *RequestContext) AccessMode {
 
-	matchData := map[string]string{
+	matchData := map[string]interface{}{
 		s.Username:  context.Username,
 		s.Verb:      context.Request.Action(),
-		s.Group:     context.Request.Group(),
+		s.Group:     context.Request.UserGroups(),
 		s.Resource:  context.Request.Resource(),
 		s.Namespace: context.Request.Namespace(),
 		s.Path:      context.Request.Path(),
 	}
-
 	for k, v := range matchData {
 		t, err := compileTemplate(k, context)
 		if err != nil {
 			fmt.Println(err)
 			return NOMATCH
 		}
-		res := match(t, v)
-		if res == false {
-			return NOMATCH
+		if x, ok := v.(string); ok {
+			res := match(t, x)
+
+			if res == false {
+				return NOMATCH
+			}
+		} else {
+			x, _ := v.([]string)
+			res := matchArray(t, x)
+
+			if res == false {
+				return NOMATCH
+			}
 		}
 	}
 	if s.Mode == "deny" {
@@ -138,4 +147,26 @@ func match(field string, str string) bool {
 		return false
 	}
 	return match
+}
+
+func matchArray(field string, arr []string) bool {
+	matchArray := false
+	if field == "" || field == "*" {
+		return true
+	}
+
+	compiledField := fmt.Sprintf("^%s$", field)
+	//	fmt.Printf("compiled field: %v, value: %v\n", compiledField, arr)
+
+	for i := range arr {
+		matchArray, err := regexp.MatchString(compiledField, arr[i])
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+			return false
+		}
+		if matchArray == true {
+			return true
+		}
+	}
+	return matchArray
 }

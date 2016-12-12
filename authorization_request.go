@@ -87,3 +87,10 @@ func (r *AuthorizationRequest) Resource() string {
 func (r *AuthorizationRequest) ServiceAccount() *ServiceAccount {
 	return NewServiceAccount(r.Spec.User)
 }
+
+func (r *AuthorizationRequest) UserGroups() []string {
+	if !r.IsResourceRequest() {
+		return nil
+	}
+	return r.Spec.Group
+}

@@ -216,3 +216,39 @@ func TestCustomVerb(t *testing.T) {
 	}
 
 }
+
+func TestMultipleGroups(t *testing.T) {
+	var saTests = []struct {
+		username string
+		group    []string
+		status   int
+	}{
+		{"system:serviceaccount:random:default", []string{"badgang", "hackers"}, 403},
+		{"system:serviceaccount:random:default", []string{"operations", "admins"}, 200},
+	}
+
+	for _, tst := range saTests {
+		j, _ := json.Marshal(tst.group)
+		render := string(j)
+		reqJSON := fmt.Sprintf(`
+    {
+      "spec":{
+        "resourceAttributes":{
+          "verb": "create",
+          "resource": "thirdpartyresources"
+        },
+        "user":"%s",
+        "group":  %v
+      }
+    }`, tst.username, render)
+		result, err := postIndex(reqJSON)
+
+		if err != nil {
+			t.Error(err)
+		}
+		if result.StatusCode != tst.status {
+			t.Errorf("Expected status %d, got: %d (%s)", tst.status, result.StatusCode, reqJSON)
+		}
+	}
+
+}
