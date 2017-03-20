@@ -117,6 +117,7 @@ func compileTemplate(tmpl string, context *RequestContext) (string, error) {
 		"replace": func(str string, regSrc string, regDst string) string {
 			re, _ := regexp.Compile(regSrc)
 			retval := re.ReplaceAll([]byte(str), []byte(regDst))
+			debug("Replace return value: %s", string(retval))
 			return string(retval)
 		},
 	}

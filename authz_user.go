@@ -24,14 +24,14 @@ func (r *AuthzUser) IsAllowed() bool {
 	for _, entry := range config.Rules {
 		accessMode := entry.GetAccessMode(r.context)
 		if accessMode == ALLOW {
-			debug("%s matched ALLOW entry %v", r.Username(), entry)
+			debug("user %s (ns %s): matched ALLOW entry %+v", r.Username(), r.Request().Namespace(), entry)
 			return true
 		} else if accessMode == DENY {
-			debug("%s matched DENY entry %v", r.Username(), entry)
+			debug("user %s (ns %s): matched DENY entry %+v", r.Username(), r.Request().Namespace(), entry)
 			return false
 		}
 	}
-	debug("%s no matches, default DENY", r.Username())
+	debug("user %s (ns %s): no matches, default DENY", r.Request().Namespace(), r.Username())
 	return false
 }
 
