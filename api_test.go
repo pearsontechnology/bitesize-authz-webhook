@@ -80,9 +80,9 @@ func TestNewAuthorizationByNamespace(t *testing.T) {
 			t.Error(err)
 		}
 
-		if result.StatusCode != tst.status {
-			t.Errorf("Expected status %d, got: %d (%s)", tst.status, result.StatusCode, reqJSON)
-		}
+		// if result.StatusCode != tst.status {
+		//  	t.Errorf("Expected status %d, got: %d (%s)", tst.status, result.StatusCode, reqJSON)
+		// }
 
 		respJSON, err := parseResponse(result)
 		if err != nil {
@@ -113,13 +113,13 @@ func TestNewAuthorizationByPath(t *testing.T) {
 		path     string
 		verb     string
 		username string
-		status   int
+		allowed  bool
 	}{
-		{"/apis", "get", "system:serviceaccount:random:default", 200},
-		{"/api", "get", "system:serviceaccount:random:default", 200},
-		{"/version", "get", "system:serviceaccount:random:default", 200},
-		{"/swaggerapi/apis/extensions/v1beta1", "get", "system:serviceaccount:random:default", 200},
-		{"/api/v1", "get", "system:serviceaccount:random:default", 403},
+		{"/apis", "get", "system:serviceaccount:random:default", true},
+		{"/api", "get", "system:serviceaccount:random:default", true},
+		{"/version", "get", "system:serviceaccount:random:default", true},
+		{"/swaggerapi/apis/extensions/v1beta1", "get", "system:serviceaccount:random:default", true},
+		{"/api/v1", "get", "system:serviceaccount:random:default", false},
 	}
 
 	for _, tst := range saTests {
@@ -138,8 +138,14 @@ func TestNewAuthorizationByPath(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if result.StatusCode != tst.status {
-			t.Errorf("Expected %d, got: %d, (%s)", tst.status, result.StatusCode, reqJSON)
+
+		respJSON, err := parseResponse(result)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if respJSON.Status.Allowed != tst.allowed {
+			t.Errorf("Bad response status, expected %t got: %t (%s)", tst.allowed, respJSON.Status.Allowed, reqJSON)
 		}
 	}
 }
@@ -150,12 +156,12 @@ func TestNewAuthorizationByVerb(t *testing.T) {
 		namespace string
 		verb      string
 		username  string
-		status    int
+		allowed   bool
 	}{
-		{"default", "watch", "system:serviceaccount:kube-system:default", 200},
-		{"default", "watch", "system:serviceaccount:random:default", 403},
-		{"default", "list", "system:serviceaccount:kube-system:default", 200},
-		{"default", "list", "system:serviceaccount:random:default", 403},
+		{"default", "watch", "system:serviceaccount:kube-system:default", true},
+		{"default", "watch", "system:serviceaccount:random:default", false},
+		{"default", "list", "system:serviceaccount:kube-system:default", true},
+		{"default", "list", "system:serviceaccount:random:default", false},
 	}
 
 	for _, tst := range saTests {
@@ -176,8 +182,12 @@ func TestNewAuthorizationByVerb(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if result.StatusCode != tst.status {
-			t.Errorf("Expected status %d, got: %d (%s)", tst.status, result.StatusCode, reqJSON)
+		respJSON, err := parseResponse(result)
+		if err != nil {
+			t.Error(err)
+		}
+		if respJSON.Status.Allowed != tst.allowed {
+			t.Errorf("Expected status %t, got: %t (%s)", tst.allowed, respJSON.Status.Allowed, reqJSON)
 		}
 	}
 }
@@ -188,9 +198,9 @@ func TestCustomVerb(t *testing.T) {
 		group    string
 		resource string
 		username string
-		status   int
+		allowed  bool
 	}{
-		{"create", "extensions", "thirdpartyresources", "system:serviceaccount:random:default", 200},
+		{"create", "extensions", "thirdpartyresources", "system:serviceaccount:random:default", true},
 	}
 
 	for _, tst := range saTests {
@@ -210,8 +220,13 @@ func TestCustomVerb(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if result.StatusCode != tst.status {
-			t.Errorf("Expected status %d, got: %d (%s)", tst.status, result.StatusCode, reqJSON)
+
+		respJSON, err := parseResponse(result)
+		if err != nil {
+			t.Error(err)
+		}
+		if respJSON.Status.Allowed != tst.allowed {
+			t.Errorf("Expected status %t, got: %t (%s)", tst.allowed, respJSON.Status.Allowed, reqJSON)
 		}
 	}
 
@@ -221,10 +236,10 @@ func TestMultipleGroups(t *testing.T) {
 	var saTests = []struct {
 		username string
 		group    []string
-		status   int
+		allowed  bool
 	}{
-		{"system:serviceaccount:random:default", []string{"badgang", "hackers"}, 403},
-		{"system:serviceaccount:random:default", []string{"operations", "admins"}, 200},
+		{"system:serviceaccount:random:default", []string{"badgang", "hackers"}, false},
+		{"system:serviceaccount:random:default", []string{"operations", "admins"}, true},
 	}
 
 	for _, tst := range saTests {
@@ -246,8 +261,13 @@ func TestMultipleGroups(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if result.StatusCode != tst.status {
-			t.Errorf("Expected status %d, got: %d (%s)", tst.status, result.StatusCode, reqJSON)
+
+		respJSON, err := parseResponse(result)
+		if err != nil {
+			t.Error(err)
+		}
+		if respJSON.Status.Allowed != tst.allowed {
+			t.Errorf("Expected status %d, got: %d (%s)", tst.allowed, respJSON.Status.Allowed, reqJSON)
 		}
 	}
 

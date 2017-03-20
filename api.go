@@ -27,7 +27,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	user := NewAuthzUser(rbody)
 
 	if !user.IsAllowed() {
-		w.WriteHeader(http.StatusForbidden)
+		// w.WriteHeader(http.StatusForbidden)
 		b, _ := json.Marshal(user.Request())
 		log.Printf("User %s forbidden, request: %s", user.Username(), string(b))
 		resp = NewAuthorizationResponse(false, "Not allowed")
