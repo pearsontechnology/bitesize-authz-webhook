@@ -93,5 +93,5 @@ Additional examples can be found in `examples` directory.
 
 
 ## Changelog
-
+* 0.0.7 - Added debugging entries
 * 0.0.5 - First open-source release. Supports HCL rules.
