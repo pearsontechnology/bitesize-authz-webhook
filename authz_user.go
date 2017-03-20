@@ -1,5 +1,10 @@
 package main
 
+import (
+	"log"
+	"os"
+)
+
 type AuthzUser struct {
 	context *RequestContext
 }
@@ -19,11 +24,14 @@ func (r *AuthzUser) IsAllowed() bool {
 	for _, entry := range config.Rules {
 		accessMode := entry.GetAccessMode(r.context)
 		if accessMode == ALLOW {
+			debug("%s matched ALLOW entry %v", r.Username(), entry)
 			return true
 		} else if accessMode == DENY {
+			debug("%s matched DENY entry %v", r.Username(), entry)
 			return false
 		}
 	}
+	debug("%s no matches, default DENY", r.Username())
 	return false
 }
 
@@ -35,4 +43,11 @@ func (r *AuthzUser) Username() string {
 // Request returns full request struct
 func (r *AuthzUser) Request() *AuthorizationRequest {
 	return r.context.Request
+}
+
+func debug(msg string, args ...interface{}) {
+	debug := os.Getenv("DEBUG")
+	if debug != "" {
+		log.Printf(msg, args...)
+	}
 }
