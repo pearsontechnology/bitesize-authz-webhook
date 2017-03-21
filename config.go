@@ -69,7 +69,7 @@ func LoadConfigFromByteArray(hclText []byte) error {
 	if err := hcl.DecodeObject(&config, hclParseTree); err != nil {
 		return err
 	}
-	debug("Loaded config rules: %q", config.Rules)
+	debug("Loaded config rules: %+q", config.Rules)
 	return nil
 }
 
