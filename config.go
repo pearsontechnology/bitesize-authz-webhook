@@ -50,6 +50,7 @@ func LoadConfigFromFile(path string) error {
 	}
 
 	hclText, err := ioutil.ReadAll(file)
+	debug("Loaded rules config: %s", string(hclText))
 	if err != nil {
 		return err
 	}
@@ -68,6 +69,7 @@ func LoadConfigFromByteArray(hclText []byte) error {
 	if err := hcl.DecodeObject(&config, hclParseTree); err != nil {
 		return err
 	}
+	debug("Loaded config rules: %q", config.Rules)
 	return nil
 }
 
