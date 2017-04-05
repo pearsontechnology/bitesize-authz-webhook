@@ -4,7 +4,7 @@
 
 `bitesize-authz-webhook` is packaged into docker container and can be found at
 `geribatai/bitesize-authz-webhook`. We do not push a 'latest' container so reference the version number.
-Currently it does not support HTTPS termination, so it is advised to run it behind HTTPS proxy.
+HTTPS termination is now supported.
 
 ## Configuration
 
@@ -72,6 +72,9 @@ spec:
 * `LISTEN_PORT` - Port webhook listens requests on (Default: 8080)
 * `RULES_CONFIG` - path to `rules.hcl` file. (Default: rules.hcl in current
 directory).
+* `HTTPS_ENABLED` - (Default: false).
+* `SSL_CERT` - (Default: cert.pem in current directory).
+* `SSL_KEY` - (Default: key.pem in current directory).
 
 ### rules.hcl
 
@@ -94,4 +97,6 @@ Additional examples can be found in `examples` directory.
 
 ## Changelog
 * 0.0.7 - Added debugging entries
+* 0.0.6 - Added ACL support for groups
+        - Added TLS support
 * 0.0.5 - First open-source release. Supports HCL rules.
