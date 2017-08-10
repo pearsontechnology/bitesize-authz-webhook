@@ -21,6 +21,7 @@ type NonResourceAttributesSpec struct {
 type AuthorizationRequestSpec struct {
 	NonResourceAttributes *NonResourceAttributesSpec `json:"nonResourceAttributes,omitempty"`
 	ResourceAttributes    *ResourceAttributesSpec    `json:"resourceAttributes,omitempty"`
+	Namespace             string                     `json:"namespace"`
 	User                  string                     `json:"user"`
 	Group                 []string                   `json:"group,omitempty"`
 }

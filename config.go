@@ -122,6 +122,14 @@ func compileTemplate(tmpl string, context *RequestContext) (string, error) {
 			debug("Replace return value: %s", string(retval))
 			return string(retval)
 		},
+        "contains": func(str []string, substr string) string {
+            for _, v := range str {
+                if v == substr {
+                    return substr
+                }
+            }
+            return ""
+        },
 	}
 
 	t, err := template.New("m").Funcs(fm).Parse(tmpl)
