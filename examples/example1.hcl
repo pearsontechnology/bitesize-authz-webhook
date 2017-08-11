@@ -26,6 +26,10 @@ access "allow" {
     username = "[a-z]+"
 }
 
+access "allow" {
+    group = "{{ .Request.Namespace }}"
+}
+
 # default service accounts can create thirdpartyresources
 access "allow" {
     username = "system:serviceaccount:.*:default"

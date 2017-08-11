@@ -81,7 +81,7 @@ func TestNewAuthorizationByNamespace(t *testing.T) {
 		}
 
 		// if result.StatusCode != tst.status {
-		//  	t.Errorf("Expected status %d, got: %d (%s)", tst.status, result.StatusCode, reqJSON)
+		//    t.Errorf("Expected status %d, got: %d (%s)", tst.status, result.StatusCode, reqJSON)
 		// }
 
 		respJSON, err := parseResponse(result)
@@ -230,6 +230,47 @@ func TestCustomVerb(t *testing.T) {
 		}
 	}
 
+}
+
+func TestGroupMatch(t *testing.T) {
+	var saTests = []struct {
+		userGroups []string
+		namespace  string
+		allowed    bool
+	}{
+		{[]string{"one", "two"}, "one", true},
+		{[]string{"one", "two"}, "three", false},
+	}
+
+	for _, tst := range saTests {
+		j, _ := json.Marshal(tst.userGroups)
+		render := string(j)
+		reqJSON := fmt.Sprintf(`
+    {
+      "spec":{
+        "resourceAttributes":{
+          "verb": "get",
+          "namespace": "%s"
+        },
+				"user": "some_user@something.com",
+        "group":  %v
+      }
+    }`, tst.namespace, render)
+		result, err := postIndex(reqJSON)
+
+		if err != nil {
+			t.Error(err)
+		}
+
+		respJSON, err := parseResponse(result)
+		if err != nil {
+			t.Error(result)
+			t.Error(err)
+		}
+		if respJSON.Status.Allowed != tst.allowed {
+			t.Errorf("Expected status %d, got: %d (%s)", tst.allowed, respJSON.Status.Allowed, reqJSON)
+		}
+	}
 }
 
 func TestMultipleGroups(t *testing.T) {

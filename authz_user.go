@@ -31,7 +31,7 @@ func (r *AuthzUser) IsAllowed() bool {
 			return false
 		}
 	}
-	debug("user %s (ns %s): no matches, default DENY", r.Request().Namespace(), r.Username())
+	debug("user %s (ns %s): no matches, default DENY", r.Username(), r.Request().Namespace())
 	return false
 }
 

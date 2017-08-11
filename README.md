@@ -96,6 +96,7 @@ Additional examples can be found in `examples` directory.
 
 
 ## Changelog
+* 0.0.8 - Fix to make "{{ .Request.Namespace }}" to work properly in the templates
 * 0.0.7 - Added debugging entries
 * 0.0.6 - Added ACL support for groups
         - Added TLS support

@@ -46,7 +46,7 @@ func NewAuthorizationRequest(body io.Reader) (*AuthorizationRequest, error) {
 // Namespace returns namespace from request
 func (r *AuthorizationRequest) Namespace() string {
 	if !r.IsResourceRequest() {
-		return ""
+		return "__MAGIC__NOMATCH_*_KEY__"
 	}
 	return r.Spec.ResourceAttributes.Namespace
 }
@@ -65,21 +65,21 @@ func (r *AuthorizationRequest) Action() string {
 // Path is in NonResourceAttributes only
 func (r *AuthorizationRequest) Path() string {
 	if r.IsResourceRequest() {
-		return ""
+		return "__MAGIC__NOMATCH_*_KEY__"
 	}
 	return r.Spec.NonResourceAttributes.Path
 }
 
 func (r *AuthorizationRequest) Group() string {
 	if !r.IsResourceRequest() {
-		return ""
+		return "__MAGIC__NOMATCH_*_KEY__"
 	}
 	return r.Spec.ResourceAttributes.Group
 }
 
 func (r *AuthorizationRequest) Resource() string {
 	if !r.IsResourceRequest() {
-		return ""
+		return "__MAGIC__NOMATCH_*_KEY__"
 	}
 	return r.Spec.ResourceAttributes.Resource
 }
